@@ -1,0 +1,32 @@
+{
+  "_comment": "Database kamera terverifikasi untuk skill cctv. Kolom: lihat contoh di bawah. Tambahkan entri baru saat runtime menemukan kamera yang BISA di-snapshot (bukan sekadar terdaftar di API).",
+  "lokasi": {
+    "spbu-gedong-tataan": {
+      "nama": "SPBU Gedong Tataan, Pesawaran, Lampung",
+      "lat": -5.381181,
+      "lng": 105.107379,
+      "kamera": [],
+      "catatan": "Belum ada kamera publik yang menghadap SPBU. Kamera terdekat = PA Gedong Tataan (badilag, ~4.8 km) tapi Cloudflare-blocked dari server — hanya bisa dilihat manual via browser: https://cctvnusantara.com/cctv/badilag-liveapp-304109862063636487844747"
+    },
+    "spbu-denpasar-bali": {
+      "nama": "SPBU Denpasar area, Bali",
+      "lat": -8.65,
+      "lng": 115.2167,
+      "kamera": [],
+      "catatan": "Pilot berikutnya: ATCS Dishub Denpasar. Cari id kamera via cctv_find.py lalu verifikasi stream-nya manual."
+    },
+    "umpri-pringsewu": {
+      "nama": "Universitas Muhammadiyah Pringsewu (UMPRI), Lampung",
+      "lat": -5.357,
+      "lng": 104.983,
+      "kamera": [],
+      "catatan": "3 kamera Badilag PA Pringsewu 0.6-0.9 km (terdekat!) tapi Cloudflare 403 dari server termasuk path stream. Hanya bisa dilihat manual via browser: https://cctvnusantara.com/cctv/badilag-liveapp-045690042322635122435808"
+    }
+  },
+  "pola_sumber_terbukti": {
+    "cctvnusantara_api": "https://www.cctvnusantara.com/api/cameras (JSON, tanpa auth)",
+    "thumbnail_endpoint": "https://www.cctvnusantara.com/api/thumbnail?id=<id> — KADANG JPEG asli, kadang placeholder SVG (cek magic bytes ffd8). Jangan andalkan.",
+    "catatan_hls": "Sebagian besar HLS pemerintah daerah url-nya kosong di API — harus di-resolve per kota. Contoh pola: cctv.pemalangkab.go.id/cctvnew/<slug> (JS), cctv.rembangkab.go.id/<unit>/hls/live.stream-<n>.ts",
+    "youtube": "yt-dlp perlu JS runtime (deno); dari IP datacenter sering kena bot-check. Butuh cookies kalau gagal."
+  }
+}
