@@ -19,6 +19,7 @@ description: >
 | `mt5-agent-setup <host>` | Setup 2 agent tester (3002+3003) di VM baru via SSH |
 | `mt5-agent-status` | Health check semua VM agent (listener, systemd, tailscale) |
 | `mt5-agent-fix <host>` | Repair: mt5linux 1.1.1, agent mati, service 1060 |
+| `mt5-agent-add-web` | Add agent remote ke terminal web (mt5.cintaku.qzz.io, container `mt5` VM1) via GUI automation |
 
 ## 2. TOPOLOGI STANDAR
 
@@ -167,3 +168,37 @@ Gejala lain:
 - Recreate container = downtime VNC/bridge ±1-2 menit — kabarin user dulu.
 - File baru di config volume → SELALU `chown 911:911`.
 - Backup file yang diedit (`docker-compose.yaml.bak-agents`).
+
+## 7. mt5-agent-add-web — add agent remote ke terminal web VM1
+
+Konteks: `mt5.cintaku.qzz.io` = VNC web ke container `mt5` VM1 (X server = **Xvnc/KasmVNC** port websocket 6901, geometry 1024x768, user container `abc`, DISPLAY :1, image `gmag11/metatrader5_vnc`). `agents.dat` TERENKripsi → satu-satunya cara = GUI automation.
+
+### 7.1 Pelajaran penting (jangan diulang!)
+1. **Jangan xrandr/resize layar atau window** — bikin geometri Wine desync → klik pun jadi ngaco. Kalau kejadian: `pkill -9 terminal64.exe` lalu start ulang (`docker exec -d -u abc -e WINEPREFIX=/config/.wine -e DISPLAY=:1 -e WINEDEBUG=-all mt5 wine "C:\Program Files\MetaTrader 5\terminal64.exe"`) → geometri bersih, input normal lagi.
+2. **Motion/hover bisa mati padahal klik jalan** (XTEST motion kadang gak sampai ke Wine). Drag splitter sering gak ngefek. Klik + keyboard SELALU jalan.
+3. **Panel tester yang kollaps/auto-hide** (cuma strip tab / caption "Strategy Tester" di bawah) → JANGAN buang waktu drag splitter. **Solusi pasti: reset layout**:
+   ```bash
+   docker exec mt5 sh -c 'pkill -9 -f terminal64.exe'; sleep 3
+   CFG="<host-path>/config/.wine/drive_c/Program Files/MetaTrader 5/Config"
+   sudo cp "$CFG/terminal.ini" "$CFG/terminal.ini.bak-$(date +%s)"
+   sudo rm -f "$CFG/terminal.ini"
+   # start terminal lagi (docker exec -d, lihat atas); tunggu ±30s
+   ```
+   Layout default: Market Watch + 2 chart + Toolbox bawah dengan tab **Tester** (paling kanan, bar y≈722-738, x≈947). Klik tab itu → tester kebuka **full size** di toolbox. Kill -9 = layout lama gak ke-save lagi.
+4. **Dialog wizard MT5 gak nerima klik mouse** (edit field & button) — tapi **keyboard jalan penuh**: Tab navigasi, `ctrl+a`, `xdotool type`, **Enter** untuk Next/Finish (**Space sering gak ngefek / salah sasaran**). Selalu verifikasi fokus button via screenshot crop sebelum Enter (ring biru/dotted).
+5. Klik koordinat harus dari **crop zoom** screenshot (eyeball full-screenshot sering meleset ±20px; layar 1024x768 real).
+
+### 7.2 Alur add agent (terbukti)
+1. Buka tab Toolbox **Tester** → sub-tab **Agents** (y≈732, x≈233) → list tampil (Local cores, Local Network Farm, MQL5 Cloud).
+2. Klik kanan list (mis. baris "Local Network Farm", y≈531) → menu → klik **+ Add**. (Row y: header 453, Local 471, Core1 491, Core2 511, Farm 531, Cloud 551 — verifikasi tiap kali.)
+3. Wizard "Add agents": radio *Add agents from host* sudah terpilih. Urutan keyboard dari fokus awal:
+   `Tab` → address: `ctrl+a` + type IP → `Tab` + type port-from (3005) → `Tab` + type port-to (3006) → `Tab` + type `MetaTester` → `Tab`×10 → (verifikasi **Next** fokus) → `Enter` → halaman "Confirm adding of listed agents" (probe jalan, agent ketemu) → `Tab`×2 → (verifikasi **Finish** fokus) → `Enter` → selesai; list langsung nampilin agent + status **ready** (hijau).
+   ⚠️ Kalau Space/Enter balik ke halaman 1 dengan nilai retained = tekanan salah sasaran (Back) — ulangi dari field; field tetap terisi.
+4. Enable agent lokal yang disabled: klik kanan row → **Enable**.
+5. Verifikasi: status **ready** hijau di UI. (TCP ke 3005/3006 baru established saat ada task — bukan tanda gagal.)
+
+### 7.3 Yang GAK usah dicoba lagi
+- Drag splitter via xdotool/VNC (VNC client KasmVNC: koneksi putus saat kirim button-press; hybrid VNC-press + xdotool-move jalan tapi gak perlu — pakai reset terminal.ini).
+- Hover slide-out panel auto-hide, double-click caption/strip (cuma toggle docked↔caption, tinggi tetap 0).
+- Edit `terminal.ini` manual buat set tinggi tester (encoding field-nya gak ketahuan).
+- `xrandr --fb` / `windowsize` buat "benerin" layout (makin rusak).
