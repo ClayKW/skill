@@ -33,7 +33,7 @@ description: >
 | VM | Tailscale IP | Port host | Catatan |
 |---|---|---|---|
 | VM1 | 100.79.153.43 | 3002/3003 langsung | + bridge mt5linux 8001 (dipakai skill signal — JANGAN DIRUSAK) |
-| VM-22 | 100.67.45.79 | 3005/3006 | container lain (mt5-2/3/4, 9router, vf-*) JANGAN disentuh |
+| VM-22 | 100.67.45.79 | 3005/3006 | container lain (mt5-2/3/4, 9router, vf-*) JANGAN disentuh. ⛔ bridge mt5linux 8001 = MATI, boleh nyala HANYA manual dengan konfirmasi eksplisit user — JANGAN pernah auto-start / restart sendiri (tidak ada systemd/cron/custom-services yang menyalakannya, biarkan begitu) |
 | VM-16 | 100.82.30.46 | 3005/3006 | image tag 1.1, config di ~/workspace/mt5-docker |
 
 ## 3. RESEP SETUP VM BARU (urutan wajib)
