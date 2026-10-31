@@ -132,3 +132,16 @@ Kerjakan berurutan, simpan temuan untuk laporan:
   tombol buka liteapks.com/app.html; (2) update checker `Xpk8a*` ke
   update.9mod.com — dead code. Clean result: `260d71d7...1689e`
   (keystore Clean v1). Tidak ada malware.
+- 2026-10-31: GBWhatsApp "MAS" v2.26.28.78 (com.universe.messenger,
+  sha256 `4c1d15f2...45262`, dari gdrive root "WA GB MAS TERBARU.apk").
+  Bukan build asli + injeksi kecil — ini FULL MOD: base WhatsApp resmi +
+  YoMods (youbasha) + layer Abu9aleh MAS. **Punya anti-tamper native**:
+  libsaleh.so + libabu9aleh.so (custom VM `vmInterpret`) melakukan
+  classesNInit0 untuk SEMUA 12 dex — logika sebagian mod tak terbaca
+  statis. URL mod di string pool native: masmods.com/up,
+  upfileapp.9aleh.com/update/devmesg.txt, 9aleh.com. Update checker
+  blogspot (com/abu9alehB58/Update) = dead code, dihapus (update caller:
+  X/001 → B58;->init tetap dipertahankan karena dipakai menu).
+  Clean result `479dae8a...06bfb8`. PERINGATAN: anti-tamper bisa
+  menolak dex hasil edit → app mungkin tidak boot; uji di device.
+  AOSP test key signature.
